@@ -1,7 +1,7 @@
 import { path, prop } from "ramda";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { makePgRestHooks } from "redux-postgrest";
+import { makePgRestHooks } from "../redux-api/main";
 import { processImageContent } from "../helpers/images";
 import { EDIT_TODO_FORM_CHANGE } from "../reducers/editTodoForm";
 

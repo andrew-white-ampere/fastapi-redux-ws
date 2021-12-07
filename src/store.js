@@ -1,6 +1,6 @@
 import { applyMiddleware, combineReducers, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import { connectPgRest } from "redux-postgrest";
+import { connectPgRest } from "./redux-api/main";
 import connectPgWebsocket from "./helpers/ws";
 import editTodo from './reducers/editTodoForm'
 import todoImage from './reducers/todoImage'
