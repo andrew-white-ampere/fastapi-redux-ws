@@ -1,35 +1,42 @@
-import { allPass, pathEq, propOr } from "ramda"
+import { pathEq, hasPath } from "ramda"
 import logger from "./log"
-
 
 const initialState = {}
 
-const urlProp = propOr("", "url")
-
 export function createReducer(opts) {
-  const isApiAction = pathEq(["meta", "api"], urlProp(opts))
   const hasMetaKind = pathEq(["meta", "kind"])
 
   const isHttpResponse = (action) => (
     hasMetaKind("RESPONSE")(action)
-  )
+  );
 
   const isHttpRequest = (action) => (
     hasMetaKind("REQUEST")(action)
-  )
+  );
+
+  const isMethodGet = (action) => (
+    pathEq(["meta", "method"], "GET")(action)
+  );
 
   return (state = initialState, action) => {
-    logger.verbose(`Reducing ${action.type} against ${opts.url}`)
+    logger.verbose(`Reducing ${action.type} against ${opts.url}`);
     
-    if (isHttpResponse(action)) {
-      logMatchingAction(opts.url, "response", action.type)
+    if (isHttpResponse(action) && isMethodGet(action)) {
+      logMatchingAction(opts.url, "response", action.type);
+      
+      const hasPrevState = hasPath([action.type])(state) && hasPath([action.meta.method])(state[action.type]);
+      const prevResourceState = hasPrevState ? state[action.type][action.meta.method]["body"] : {};
+      const indexedResponse =  action.meta.response.body.reduce((a, x) => ({...a, [x.pk]: x}), {});
+      const newResourceState = {...prevResourceState, ...indexedResponse};
+
+      // ...prevResourceState,
+
       return {
         ...state,
         [action.type]: {
-          ...initialResourceState(),
           ...state[action.type],
           [action.meta.method]: {
-            ...action.meta.response,
+            "body": newResourceState,
             url: action.meta.url,
             query: action.meta.query,
             loading: false,
@@ -46,7 +53,6 @@ export function createReducer(opts) {
       return {
         ...state,
         [action.type]: {
-          ...initialResourceState(),
           ...prevResourceState,
           [action.meta.method]: {
             ...(prevResourceState && prevResourceState[action.meta.method]),
@@ -57,19 +63,10 @@ export function createReducer(opts) {
         },
       }
     }
-
     return state
   }
 }
 
-function initialResourceState() {
-  return {
-    ["GET"]: null,
-    ["POST"]: null,
-    ["PATCH"]: null,
-    ["DELETE"]: null,
-  }
-}
 
 function logMatchingAction(url, kind, type) {
   logger.debug(`Reducing received HTTP ${kind} ${type} against ${url}`)

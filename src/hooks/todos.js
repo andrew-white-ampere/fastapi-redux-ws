@@ -28,7 +28,7 @@ export function useListTodos() {
       dispatchLoadAction();
     }
   }, [dispatchLoadAction, todos, isDispatching]);
-
+  console.log(JSON.stringify(todos));
   return todos;
 }
 

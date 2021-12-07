@@ -31,20 +31,6 @@ export default function addActionMeta(
         },
       }
     }
-
-    if (matchesRpcEndpoint(action, apiRoot)) {
-      logger.verbose(`Adding RPC action meta for ${action.type}`)
-      return {
-        ...action,
-        meta: {
-          method: "POST",
-          url: concat(opts.url, pathTypePropRpc(action)),
-          ...getCommonMetaProps(opts, action),
-        },
-      }
-    }
-
-    return action;
   }
 }
 
@@ -69,10 +55,8 @@ function standardiseActionMeta(meta) {
   return meta
 }
 
-const typeProp = prop("type")
-
 const pathTypePropRest = pipe(
-  typeProp,
+  prop("type"),
   toLower,
   concat("/"),
 )
@@ -83,23 +67,6 @@ function matchesRestEndpoint(
 ) {
   return propSatisfies(
     pipe(keys, includes(pathTypePropRest(action))),
-    "paths",
-    apiRoot,
-  )
-}
-
-const pathTypePropRpc = pipe(
-  typeProp,
-  toLower,
-  concat("/rpc/"),
-)
-
-function matchesRpcEndpoint(
-  action,
-  apiRoot,
-) {
-  return propSatisfies(
-    pipe(keys, includes(pathTypePropRpc(action))),
     "paths",
     apiRoot,
   )

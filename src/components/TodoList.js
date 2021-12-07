@@ -17,7 +17,7 @@ export default function Todos() {
   const dispatchHideTodoImage = useDispatchHideTodoImage()
   const imageState = useTodoImageState();
   const todo_image =  useSelectTodoImage();
-
+  
   // if (todos && imageState.show) {
   //   return (
   //     <div className="todos">
@@ -46,8 +46,8 @@ export default function Todos() {
         </TableHead>
         <TableBody>
       {todos &&
-        todos.map((props, todo_pk) => (
-          <TodoListItem {...{ ...props, todo_pk }} key={todo_pk} />
+        Object.entries(todos).map(([todo_pk, props]) => (
+          <TodoListItem  {...props} key={todo_pk}/>
         ))}
         </TableBody>
       </Table>

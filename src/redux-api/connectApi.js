@@ -14,7 +14,7 @@ export default function connectApi(
   return {
     middleware: (store) => {
       logger.verbose(
-        `Initialising redux connector for api at ${optsInternal.url}`,
+        `Initialising redux api connector for api at ${optsInternal.url}`,
       )
 
       const handleAction = queueActions(() =>
