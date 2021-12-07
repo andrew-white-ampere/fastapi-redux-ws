@@ -19,7 +19,7 @@ export default function addActionMeta(
   forEach(k => logger.verbose(`  ${k}`), keys(prop("paths", apiRoot)))
 
   return (action) => {
-    logger.verbose(`Identifying action meta for ${action.type}`)
+    logger.verbose(`Identifying action meta for ${action.type} with action ${JSON.stringify(action)}`)
     if (matchesRestEndpoint(action, apiRoot)) {
       logger.verbose(`Adding REST action meta for ${action.type}`)
       return {
@@ -28,6 +28,7 @@ export default function addActionMeta(
           method: "GET",
           url: concat(opts.url, pathTypePropRest(action)),
           ...getCommonMetaProps(opts, action),
+          query: {pk: action.pk}
         },
       }
     }

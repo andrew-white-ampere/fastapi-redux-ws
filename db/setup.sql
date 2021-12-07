@@ -35,7 +35,7 @@ CREATE OR REPLACE FUNCTION notify_websocket_trigger_table() RETURNS TRIGGER
 $$
 BEGIN
   PERFORM notify_websocket(
-    jsonb_build_object('resource', tg_table_name) :: TEXT
+    jsonb_build_object('resource', tg_table_name, 'pk', NEW.pk) :: TEXT
     );
   RETURN new;
 END;
@@ -48,11 +48,8 @@ CREATE TRIGGER notify_todos
     INSERT
     OR
     UPDATE
-    OR
-    DELETE
-    OR TRUNCATE
   ON private.todos
-  FOR EACH STATEMENT
+  FOR EACH ROW
 EXECUTE FUNCTION notify_websocket_trigger_table();
 
 CREATE OR REPLACE FUNCTION todos_insert() RETURNS TRIGGER
