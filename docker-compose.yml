@@ -9,23 +9,14 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret
-
-  api:
-    image: postgrest/postgrest
-    ports:
-      - "8000:3000"
-    environment:
-      PGRST_DB_URI: postgres://postgres:secret@db:5432/postgres
-      PGRST_DB_SCHEMA: public
-      PGRST_DB_ANON_ROLE: postgres
-    depends_on:
-      - db
-
   ws:
-    image: andytango/pg_websocket
-    ports:
-      - "8080:8080"
+    image: diogob/postgres-websockets
     environment:
-      PG_URL: postgres://postgres:secret@db:5432/postgres
+      PGWS_DB_URI: postgres://postgres:secret@db:5432/postgres
+      PGWS_JWT_SECRET: "auwhfdnskjhewfi34uwehdlaehsfkuaeiskjnfduierhfsiweskjcnzeiluwhskdewishdnpwe"
+      PGWS_ROOT_PATH: /home/postgres-websockets/client-example
+      PGWS_LISTEN_CHANNEL: "pgws_socket"
+    ports:
+        - "8080:3000"
     depends_on:
-      - db
+        - db

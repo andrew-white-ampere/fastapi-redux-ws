@@ -32,6 +32,13 @@ export function useListTodos() {
   return todos;
 }
 
+export function useGetTodo(){
+  const dispatch = useDispatchGet();
+  return useCallback(pk => dispatch({pk: `${pk}`}),[
+    dispatch
+  ]);
+}
+
 export function useCreateTodo() {
   const dispatch = useDispatchPost();
   const [content, setContent] = useState("");
@@ -72,7 +79,7 @@ export function useDispatchEditTodo() {
 export function useDeleteTodo() {
   const dispatch = useDispatchDelete();
 
-  return useCallback(todo_id => dispatch({ todo_id: `eq.${todo_id}` }), [
+  return useCallback(pk => dispatch({ pk: `${pk}` }), [
     dispatch
   ]);
 }

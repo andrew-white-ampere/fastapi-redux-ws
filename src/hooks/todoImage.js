@@ -12,7 +12,7 @@ export function useTodoImageState() {
 
 export function useDispatchHideTodoImage() {
   const dispatch = useDispatch();
-  return useCallback(() => dispatch({ type: HIDE_TODO_IMAGE }), [dispatch]);
+  return useCallback(() => dispatch({ type: 'HIDE_TODO_IMAGE' }), [dispatch]);
 }
 
 export function useDispatchShowTodoImage(todo_idx) {

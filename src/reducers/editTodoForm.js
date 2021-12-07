@@ -12,7 +12,6 @@ export default function editTodo(state = initialState, { type, ...action }) {
   if (type === EDIT_TODO_FORM_CHANGE) {
     return handleFormChange(action);
   }
-
   return state;
 }
 

@@ -1,9 +1,24 @@
+
+import jws from 'jws'
+
+function sign(payload, key) {
+  return { result: jws.sign({header: {alg: 'HS256'}, payload: JSON.stringify(payload), secret: 'auwhfdnskjhewfi34uwehdlaehsfkuaeiskjnfduierhfsiweskjcnzeiluwhskdewishdnpwe'}), error: '' };
+}
+
+function get_jwt() {
+  return sign({
+    mode: 'rw'
+  }, 'auwhfdnskjhewfi34uwehdlaehsfkuaeiskjnfduierhfsiweskjcnzeiluwhskdewishdnpwe').result;
+}
+
 export default function connectPgWebsocket({ url }) {
   return next => {
     return reducer => {
       const store = next(reducer);
-      const ws = new WebSocket(url);
-
+      const jwt = get_jwt();
+      const wsurl = url+ '/' + jwt;
+      const ws = new WebSocket(wsurl);
+      
       addWsMessageListener(ws, store);
 
       return store;
@@ -27,5 +42,6 @@ function handleWsMessage(store, data) {
 
 function dispatchWsMessage(store, data) {
   const { resource } = JSON.parse(data);
-  store.dispatch({ type: resource });
+  const payload = JSON.parse(resource);
+  store.dispatch({ type: payload.resource, pk: payload.pk });
 }

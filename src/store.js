@@ -11,8 +11,8 @@ const { reducer, middleware } = connectPgRest({
 
 const store = createStore(
   combineReducers({ api: reducer, editTodo, todoImage }),
-  composeWithDevTools(
-    connectPgWebsocket({ url: "ws://localhost:8080" }),
+  composeWithDevTools( 
+    connectPgWebsocket({ url: "ws://localhost:8080/websocket" }),
     applyMiddleware(middleware)
   )
 );

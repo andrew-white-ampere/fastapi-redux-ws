@@ -23,7 +23,10 @@ CREATE OR REPLACE FUNCTION notify_websocket(payload TEXT) RETURNS VOID
   LANGUAGE PLPGSQL AS
 $$
 BEGIN
-  EXECUTE format('NOTIFY websocket, %1$L', concat(payload, E'\n'));
+  EXECUTE pg_notify(
+    'pgws_socket',
+    json_build_object('channel', 'websocket', 'resource', payload)::text
+	);
 END;
 $$;
 
@@ -38,7 +41,7 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS notify_todos ON todos;
+DROP TRIGGER IF EXISTS notify_todos ON private.todos;
 
 CREATE TRIGGER notify_todos
   AFTER
@@ -59,7 +62,6 @@ BEGIN
   INSERT INTO private.todos (content, content_image)
   VALUES (new.content,
           decode(new.content_image, 'base64'));
-
   RETURN new;
 END;
 $$;

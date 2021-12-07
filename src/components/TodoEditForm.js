@@ -13,7 +13,7 @@ export default function TodoEditForm({ todo_id }) {
         onChange={e => setEditFormState({ todo_id, content: e.target.value })}
         value={editFormState.content}
       />
-      <button onClick={submitTodo}>Done</button>
+      <button onClick={submitTodo}>Doner</button>
     </span>
   );
 }
