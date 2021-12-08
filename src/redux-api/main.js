@@ -1,32 +1,32 @@
 import connectApi from "./connectApi"
 import {
-  createPgRestActions,
-  createPgRestActionGet,
-  createPgRestActionPost,
-  createPgRestActionPatch,
-  createPgRestActionDelete,
+  createReduxApiActions,
+  createReduxApiActionGet,
+  createReduxApiActionPost,
+  createReduxApiActionPatch,
+  createReduxApiActionDelete,
 } from "./actionCreators"
 import {
-  makePgRestHooks,
-  makePgRestHookGet,
-  makePgRestHookPost,
-  makePgRestHookPatch,
-  makePgRestHookDelete,
+  makeReduxApiHooks,
+  makeReduxApiHookGet,
+  makeReduxApiHookPost,
+  makeReduxApiHookPatch,
+  makeReduxApiHookDelete,
 } from "./hooks"
 
-import { createPgRestSelectors } from "./selectors"
+import { createReduxApiSelectors } from "./selectors"
 
 export {
-  connectApi as connectPgRest,
-  createPgRestActions,
-  createPgRestActionGet,
-  createPgRestActionPost,
-  createPgRestActionPatch,
-  createPgRestActionDelete,
-  createPgRestSelectors,
-  makePgRestHooks,
-  makePgRestHookGet,
-  makePgRestHookPost,
-  makePgRestHookPatch,
-  makePgRestHookDelete,
+  connectApi as connectReduxApi,
+  createReduxApiActions,
+  createReduxApiActionGet,
+  createReduxApiActionPost,
+  createReduxApiActionPatch,
+  createReduxApiActionDelete,
+  createReduxApiSelectors,
+  makeReduxApiHooks,
+  makeReduxApiHookGet,
+  makeReduxApiHookPost,
+  makeReduxApiHookPatch,
+  makeReduxApiHookDelete,
 }

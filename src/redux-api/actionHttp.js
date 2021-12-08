@@ -1,5 +1,5 @@
-import { stringify } from "query-string"
-import { path, pathEq, pick, pipe, toLower } from "ramda"
+import { stringify } from "querystring"
+import { path, pathEq, pick, pipe, toLower, hasPath } from "ramda"
 import { isString, isObject } from "./util"
 import logger from "./log"
 
@@ -46,19 +46,17 @@ function dispatchResponse(
   })
 }
 
-
 export default function actionHttp(opts, store) {
   logger.verbose("Action HTTP handler initialised")
 
   return (action) => {
     if (isHttpRequestAction(action)) {
-      logRequest(action)
-      performHttpRequest(opts.http, action).then((response) => {
-        logResponse(action)
-        dispatchResponse(store, action, response)
-      })
+        logRequest(action)
+        performHttpRequest(opts.http, action).then((response) => {
+          logResponse(action)
+          dispatchResponse(store, action, response)
+        })
     }
-
     return action
   }
 }

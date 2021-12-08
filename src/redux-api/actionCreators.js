@@ -1,14 +1,14 @@
 
-export function createPgRestActions(type) {
+export function createReduxApiActions(type) {
   return {
-    get: createPgRestActionGet(type),
-    post: createPgRestActionPost(type),
-    patch: createPgRestActionPatch(type),
-    delete: createPgRestActionDelete(type),
+    get: createReduxApiActionGet(type),
+    post: createReduxApiActionPost(type),
+    patch: createReduxApiActionPatch(type),
+    delete: createReduxApiActionDelete(type),
   }
 }
 
-export function createPgRestActionGet(type) {
+export function createReduxApiActionGet(type) {
   return (query = {}, meta = {}) =>
     ({
       type,
@@ -16,7 +16,7 @@ export function createPgRestActionGet(type) {
     })
 }
 
-export function createPgRestActionPost(type) {
+export function createReduxApiActionPost(type) {
   return (body, meta = {}) =>
     ({
       type,
@@ -24,7 +24,7 @@ export function createPgRestActionPost(type) {
     })
 }
 
-export function createPgRestActionPatch(type) {
+export function createReduxApiActionPatch(type) {
   return (query, body, meta = {}) =>
     ({
       type,
@@ -32,7 +32,7 @@ export function createPgRestActionPatch(type) {
     })
 }
 
-export function createPgRestActionDelete(type) {
+export function createReduxApiActionDelete(type) {
   return (query, meta = {}) =>
     ({
       type,

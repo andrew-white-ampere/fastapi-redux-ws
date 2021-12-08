@@ -1,8 +1,9 @@
 import React, { useCallback } from "react";
-import { useGetEditFormState, useSetEditFormState, useGetTodo } from "../hooks/todos";
+import { useGetEditFormState, useSetEditFormState, useDispatchEditTodo } from "../hooks/todos";
 import { useDispatchHideTodoImage } from "../hooks/todoImage";
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
+import TodoEditForm from "./TodoEditForm";
 
 
 export default function TodoListItem({
@@ -15,19 +16,27 @@ export default function TodoListItem({
   const editFormState = useGetEditFormState();
   const setEditFormState = useSetEditFormState();
   const isEditing = editFormState.pk === pk;
-
-  const dispatchGetAction = useGetTodo();
+  const onContentClick = useCallback(
+    () => setEditFormState({ pk, content }),
+    [setEditFormState, pk, content]
+  );
+  const dispatchEditAction = useDispatchEditTodo();
 
   return (
     <TableRow key={todo_pk}>
               <TableCell component="th" scope="row">
                 {pk}
               </TableCell>
+              {isEditing ? (
+                  <TodoEditForm pk={pk} />
+                ) : (
+                  <TableCell onClick={() => onContentClick()}>{content}</TableCell>
+                )}
               <TableCell align="right"> {content}</TableCell>
               <TableCell align="left">{created_at}</TableCell>
               <TableCell align="right">{todo_idx}</TableCell>
               <TableCell align="right"></TableCell>
-              <TableCell onClick={() => dispatchGetAction(pk)}>refresh</TableCell>
+              <TableCell onClick={() => dispatchEditAction()}>refresh</TableCell>
     </TableRow>
   );
 }

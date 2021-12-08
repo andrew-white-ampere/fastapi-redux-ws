@@ -1,46 +1,46 @@
 import { useDispatch } from "react-redux"
 import { compose } from "redux"
 import {
-  createPgRestActionDelete,
-  createPgRestActionGet,
-  createPgRestActionPatch,
-  createPgRestActionPost,
+  createReduxApiActionDelete,
+  createReduxApiActionGet,
+  createReduxApiActionPatch,
+  createReduxApiActionPost,
 } from "./actionCreators"
 
-export function makePgRestHooks(type) {
+export function makeReduxApiHooks(type) {
   return {
-    useDispatchGet: makePgRestHookGet(type),
-    useDispatchPost: makePgRestHookPost(type),
-    useDispatchPatch: makePgRestHookPatch(type),
-    useDispatchDelete: makePgRestHookDelete(type),
+    useDispatchGet: makeReduxApiHookGet(type),
+    useDispatchPost: makeReduxApiHookPost(type),
+    useDispatchPatch: makeReduxApiHookPatch(type),
+    useDispatchDelete: makeReduxApiHookDelete(type),
   }
 }
 
-export function makePgRestHookGet(type) {
+export function makeReduxApiHookGet(type) {
   return createDispatchHookFn(
-    createPgRestActionGet(type),
-    formatPgRestHookName("Get", type),
+    createReduxApiActionGet(type),
+    formatReduxApiHookName("Get", type),
   )
 }
 
-export function makePgRestHookPost(type) {
+export function makeReduxApiHookPost(type) {
   return createDispatchHookFn(
-    createPgRestActionPost(type),
-    formatPgRestHookName("Post", type),
+    createReduxApiActionPost(type),
+    formatReduxApiHookName("Post", type),
   )
 }
 
-export function makePgRestHookPatch(type) {
+export function makeReduxApiHookPatch(type) {
   return createDispatchHookFn(
-    createPgRestActionPatch(type),
-    formatPgRestHookName("Patch", type),
+    createReduxApiActionPatch(type),
+    formatReduxApiHookName("Patch", type),
   )
 }
 
-export function makePgRestHookDelete(type) {
+export function makeReduxApiHookDelete(type) {
   return createDispatchHookFn(
-    createPgRestActionDelete(type),
-    formatPgRestHookName("Delete", type),
+    createReduxApiActionDelete(type),
+    formatReduxApiHookName("Delete", type),
   )
 }
 
@@ -58,6 +58,6 @@ function createDispatchHookFn(
   return useHookFn
 }
 
-function formatPgRestHookName(verb, type) {
-  return `usePgRest${verb}(${type})`
+function formatReduxApiHookName(verb, type) {
+  return `useReduxApi${verb}(${type})`
 }

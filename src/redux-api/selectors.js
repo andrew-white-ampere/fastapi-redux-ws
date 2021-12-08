@@ -2,7 +2,7 @@ import { has, identity, ifElse, pathOr, pipe } from "ramda"
 
 
 
-export function createPgRestSelectors(
+export function createReduxApiSelectors(
   reducerKey = '',
 ) {
   const createSelectorFactoryForMethod = createSelectorFactoryForReducer(

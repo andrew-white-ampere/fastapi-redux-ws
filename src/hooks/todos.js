@@ -1,26 +1,28 @@
 import { path, prop } from "ramda";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { makePgRestHooks } from "../redux-api/main";
+import { makeReduxApiHooks } from "../redux-api/main";
 import { processImageContent } from "../helpers/images";
 import { EDIT_TODO_FORM_CHANGE } from "../reducers/editTodoForm";
+import logger from "../redux-api/log";
 
 const {
   useDispatchGet,
   useDispatchPost,
   useDispatchPatch,
   useDispatchDelete
-} = makePgRestHooks("todos");
+} = makeReduxApiHooks("todos");
 
 const todosFromState = path(["api", "todos", "GET", "body"]);
 
-export function useListTodos() {
+export function useListTodos(pks) {
   const dispatch = useDispatchGet();
   const todos = useSelector(todosFromState);
+  
   const [isDispatching, setIsDispatching] = useState();
   const dispatchLoadAction = useCallback(() => {
     setIsDispatching(true);
-    dispatch();
+    dispatch({pk: pks});
   }, [setIsDispatching, dispatch]);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export function useListTodos() {
 
 export function useGetTodo(){
   const dispatch = useDispatchGet();
-  return useCallback(pk => dispatch({pk: `${pk}`}),[
+  return useCallback(pk => dispatch({pk: [pk]}),[
     dispatch
   ]);
 }
@@ -66,11 +68,12 @@ export function useSetEditFormState() {
 }
 
 export function useDispatchEditTodo() {
-  const { todo_id, content } = useGetEditFormState();
+  const { pk, content } = useGetEditFormState();
+  logger.verbose(`todopk, content: ${pk}, ${JSON.stringify(content)}`)
   const dispatchPatch = useDispatchPatch();
   const dispatch = useCallback(
-    () => dispatchPatch({ todo_id: `eq.${todo_id}` }, { content }),
-    [dispatchPatch, todo_id, content]
+    () => dispatchPatch({ pk: pk }, { content }),
+    [dispatchPatch, pk, content]
   );
 
   return dispatch;

@@ -30,27 +30,55 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION notify_websocket_trigger_table() RETURNS TRIGGER
-  LANGUAGE PLPGSQL AS
-$$
+
+
+CREATE OR REPLACE FUNCTION notify_websocket_modified() RETURNS TRIGGER AS $$
+DECLARE
+msg jsonb;
 BEGIN
-  PERFORM notify_websocket(
-    jsonb_build_object('resource', tg_table_name, 'pk', NEW.pk) :: TEXT
-    );
-  RETURN new;
+IF (TG_OP = 'UPDATE' OR TG_OP = 'INSERT') THEN
+    SELECT jsonb_build_object('resource', tg_table_name, 'op', tg_op, 'pk', jsonb_agg(new_table.pk))
+		FROM new_table
+	INTO msg;
+    PERFORM notify_websocket(msg::text);
+ELSIF (TG_OP = 'DELETE') THEN
+	SELECT jsonb_build_object('resource', tg_table_name, 'op', tg_op, 'pk', jsonb_agg(old_table.pk))
+		FROM old_table
+	INTO msg;
+    PERFORM notify_websocket(msg::text);
+ELSIF (TG_OP = 'TRUNCATE') THEN
+    PERFORM notify_websocket(jsonb_build_object('resource', tg_table_name, 'op', 'TRUNCATE')::text);
+END IF;
+RETURN NEW;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS notify_todos ON private.todos;
 
-CREATE TRIGGER notify_todos
-  AFTER
-    INSERT
-    OR
-    UPDATE
-  ON private.todos
-  FOR EACH ROW
-EXECUTE FUNCTION notify_websocket_trigger_table();
+DROP TRIGGER IF EXISTS todo_insert_trig ON private.todos;
+CREATE TRIGGER todo_insert_trig AFTER INSERT ON private.todos 
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE PROCEDURE notify_websocket_modified();
+
+DROP TRIGGER IF EXISTS todo_update_trig ON private.todos;
+CREATE TRIGGER todo_update_trig AFTER UPDATE ON private.todos 
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE PROCEDURE notify_websocket_modified();
+
+DROP TRIGGER IF EXISTS todo_delete_trig ON private.todos;
+CREATE TRIGGER todo_delete_trig AFTER DELETE ON private.todos 
+REFERENCING OLD TABLE AS old
+FOR EACH STATEMENT EXECUTE PROCEDURE notify_websocket_modified();
+
+DROP TRIGGER IF EXISTS todo_truncate_trig ON private.todos;
+CREATE TRIGGER todo_truncate_trig AFTER TRUNCATE ON private.todos 
+FOR EACH STATEMENT EXECUTE PROCEDURE notify_websocket_modified();
+
+
+
+
+
+
+
 
 CREATE OR REPLACE FUNCTION todos_insert() RETURNS TRIGGER
   LANGUAGE PLPGSQL AS
