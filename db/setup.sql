@@ -1,4 +1,5 @@
-CREATE SCHEMA IF NOT EXISTS private;
+DROP SCHEMA IF EXISTS private CASCADE;
+CREATE SCHEMA private;
 
 DROP VIEW IF EXISTS public.todos;
 
@@ -6,14 +7,15 @@ DROP TABLE IF EXISTS private.todos;
 
 CREATE TABLE private.todos
 (
-  todo_id       INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  pk       INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   content       TEXT        NOT NULL,
   content_image BYTEA,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+
 CREATE VIEW public.todos AS
-SELECT todo_id,
+SELECT pk,
        content,
        encode(content_image, 'base64') AS content_image,
        created_at
@@ -66,7 +68,7 @@ FOR EACH STATEMENT EXECUTE PROCEDURE notify_websocket_modified();
 
 DROP TRIGGER IF EXISTS todo_delete_trig ON private.todos;
 CREATE TRIGGER todo_delete_trig AFTER DELETE ON private.todos 
-REFERENCING OLD TABLE AS old
+REFERENCING OLD TABLE AS old_table
 FOR EACH STATEMENT EXECUTE PROCEDURE notify_websocket_modified();
 
 DROP TRIGGER IF EXISTS todo_truncate_trig ON private.todos;
@@ -107,7 +109,7 @@ BEGIN
   UPDATE private.todos
   SET content       = new.content,
       content_image = decode(new.content_image, 'base64')
-  WHERE todo_id = new.todo_id;
+  WHERE pk = new.pk;
 
   RETURN new;
 END;

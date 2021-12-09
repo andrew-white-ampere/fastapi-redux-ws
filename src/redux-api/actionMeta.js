@@ -23,7 +23,7 @@ export default function addActionMeta(
     logger.verbose(`Identifying action meta for ${action.type} with action ${JSON.stringify(action)}`)
     if (matchesRestEndpoint(action, apiRoot)) {
       logger.verbose(`Adding REST action meta for ${action.type} for op ${action.op}`)
-      if (action.op == 'INSERT' || action.op == 'UPDATE' || action.op == 'GET'){
+      if (action.op === 'INSERT' || action.op === 'UPDATE' || action.op === 'GET'){
         return {
           ...action,
           meta: {

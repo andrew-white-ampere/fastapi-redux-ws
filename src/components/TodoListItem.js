@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useGetEditFormState, useSetEditFormState, useDispatchEditTodo } from "../hooks/todos";
+import { useGetEditFormState, useSetEditFormState, useDispatchEditTodo, useDispatchDeleteTodo } from "../hooks/todos";
 import { useDispatchHideTodoImage } from "../hooks/todoImage";
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
@@ -20,7 +20,7 @@ export default function TodoListItem({
     () => setEditFormState({ pk, content }),
     [setEditFormState, pk, content]
   );
-  const dispatchEditAction = useDispatchEditTodo();
+  const dispatchDelete = useDispatchDeleteTodo();
 
   return (
     <TableRow key={todo_pk}>
@@ -36,7 +36,7 @@ export default function TodoListItem({
               <TableCell align="left">{created_at}</TableCell>
               <TableCell align="right">{todo_idx}</TableCell>
               <TableCell align="right"></TableCell>
-              <TableCell onClick={() => dispatchEditAction()}>refresh</TableCell>
+              <TableCell onClick={() => dispatchDelete(pk)}>delete</TableCell>
     </TableRow>
   );
 }

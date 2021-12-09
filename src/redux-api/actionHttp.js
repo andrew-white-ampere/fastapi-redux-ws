@@ -36,6 +36,7 @@ function dispatchResponse(
   action,
   response,
 ) {
+  logger.verbose(`dispatching http response for ${JSON.stringify(action)} with response ${JSON.stringify(response)}`);
   store.dispatch({
     ...action,
     meta: {

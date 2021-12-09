@@ -18,6 +18,10 @@ export function createReducer(opts) {
     pathEq(["meta", "method"], "GET")(action)
   );
 
+  const isMethodPost = (action) => (
+    pathEq(["meta", "method"], "POST")(action)
+  );
+
   return (state = initialState, action) => {
     logger.verbose(`Reducing ${action.type} against ${opts.url}`);
     
@@ -28,8 +32,6 @@ export function createReducer(opts) {
       const prevResourceState = hasPrevState ? state[action.type][action.meta.method]["body"] : {};
       const indexedResponse =  action.meta.response.body.reduce((a, x) => ({...a, [x.pk]: x}), {});
       const newResourceState = {...prevResourceState, ...indexedResponse};
-
-      // ...prevResourceState,
 
       return {
         ...state,
@@ -45,24 +47,51 @@ export function createReducer(opts) {
         },
       }
     }
+    
+    if (hasPath(["op"])(action) && action.op === "DELETE"){
+      
+      const hasPrevState = hasPath([action.type])(state) && hasPath([action.meta.method])(state[action.type]);
+      const resourceState = hasPrevState ? state[action.type][action.meta.method]["body"] : {};
+      
+      action.pk.forEach(pk => {if (pk in resourceState) delete resourceState[pk]})
+      
+      return {
+        ...state,
+        [action.type]: {
+          ...state[action.type],
+          [action.meta.method]: {
+            "body": resourceState,
+            loading: false
+          }
+        }
+      }
+    }
 
-    if (isHttpRequest(action)) {
-      logMatchingAction(opts.url, "request", action.type)
-      const prevResourceState = state[action.type]
+    if (isHttpResponse(action) && isMethodPost(action)){
+      logger.verbose(`ismethod post response`);
+      const hasPrevState = hasPath([action.type])(state) && hasPath([action.meta.method])(state[action.type]);
+      const resourceState = hasPrevState ? state[action.type][action.meta.method]["body"] : {};
+      const newObj = {
+        [action.meta.response.body]: {pk: action.meta.response.body}
+      }
+
+      const newResourceState = {...resourceState, ...newObj}
+
+      logger.verbose(`new resource state is ${JSON.stringify(newResourceState)}`);
 
       return {
         ...state,
         [action.type]: {
-          ...prevResourceState,
+          ...state[action.type],
           [action.meta.method]: {
-            ...(prevResourceState && prevResourceState[action.meta.method]),
-            url: action.meta.url,
-            query: action.meta.query,
-            loading: true,
-          },
-        },
+            "body": newResourceState,
+            loading: false
+          }
+        }
       }
     }
+
+    
     return state
   }
 }

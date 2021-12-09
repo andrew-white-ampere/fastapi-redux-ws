@@ -15,14 +15,14 @@ const {
 
 const todosFromState = path(["api", "todos", "GET", "body"]);
 
-export function useListTodos(pks) {
+export function useListTodos(pks=null) {
   const dispatch = useDispatchGet();
   const todos = useSelector(todosFromState);
   
   const [isDispatching, setIsDispatching] = useState();
   const dispatchLoadAction = useCallback(() => {
     setIsDispatching(true);
-    dispatch({pk: pks});
+    pks ? dispatch({pk: pks}) : dispatch();
   }, [setIsDispatching, dispatch]);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function useCreateTodo() {
   const submitTodo = useCallback(
     () =>
       processImageContent(imageContent).then(image =>
-        dispatch({ content, content_image: image })
+        dispatch({ content, content_image: image, op: 'POST' })
       ),
     [dispatch, content, imageContent]
   );
@@ -79,7 +79,7 @@ export function useDispatchEditTodo() {
   return dispatch;
 }
 
-export function useDeleteTodo() {
+export function useDispatchDeleteTodo() {
   const dispatch = useDispatchDelete();
 
   return useCallback(pk => dispatch({ pk: `${pk}` }), [

@@ -34,8 +34,11 @@ app.add_middleware(
 
 @app.get('/todos', response_model=List[TodoModel])
 async def get_todo(pk: List[int] = Query(None)) -> List[TodoModel]:
-	async with engine.begin() as conn:	
-		res = await conn.execute(text('SELECT * FROM todos  WHERE pk = ANY(:pk)'), {'pk': pk})
+	async with engine.begin() as conn:
+		if pk:
+			res = await conn.execute(text('SELECT * FROM todos  WHERE pk = ANY(:pk)'), {'pk': pk})
+		else:
+			res = await conn.execute(text('SELECT * FROM todos'))
 		res = [TodoModel(**dict(r)) for r in res.fetchall()]
 		return res
 
@@ -47,16 +50,17 @@ async def delete_todo(pk: int) -> bool:
 		"""), {'pk': pk})
 	return True
 
-@app.post('/todos', response_model=bool)
-async def post_todo(todo: TodoModel) -> bool:
+@app.post('/todos', response_model=int)
+async def post_todo(todo: TodoModel) -> int:
 	async with engine.begin() as conn:
 		res = await conn.execute(
 			text("""
 				INSERT INTO private.todos (content, content_image)
-				VALUES (:content, :content_image);
+				VALUES (:content, :content_image)
+				RETURNING pk;
 			"""), {'content': todo.content, 'content_image': todo.content_image}
 		)
-	return True
+	return res.fetchone()[0]
 
 @app.patch('/todos', response_model=bool)
 async def patch_todo(pk: int, todo: TodoModel) -> bool:
