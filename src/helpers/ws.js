@@ -2,7 +2,15 @@
 import jws from 'jws';
 import logger from '../redux-api/log';
 import { hasPath, anyPass } from 'ramda';
-
+import {
+  pipe,
+  prop,
+  toLower,
+  concat
+} from 'ramda';
+import { httpFetch } from '../redux-api/httpFetch';
+import addActionMeta from '../redux-api/actionMeta';
+import actionHttp from '../redux-api/actionHttp';
 
 function sign(payload, key) {
   return { result: jws.sign({header: {alg: 'HS256'}, payload: JSON.stringify(payload), secret: 'auwhfdnskjhewfi34uwehdlaehsfkuaeiskjnfduierhfsiweskjcnzeiluwhskdewishdnpwe'}), error: '' };
@@ -33,37 +41,41 @@ function addWsMessageListener(ws, store) {
   ws.addEventListener("message", ({ data }) => handleWsMessage(store, data));
 }
 
-function isRelevantAction(store, action) {
-  logger.verbose(`action is ${JSON.stringify(action)}`)
-  const pkPresent = hasPath(["pk"])(action);
-  logger.verbose(`pk is present? ${pkPresent}`)
-  if (!pkPresent) return true;
+function extractRelevantAction(store, payload) {
   const state = store.getState()
-  const hasType = hasPath(['api', action.resource, "GET", "body"])(state);
-  logger.verbose(`hastype ${hasType}`)
-  if (!hasType) return true;
-  logger.verbose(`state: ${JSON.stringify(state)}`);
-  let stateHasPk = false;
-  for (let i = 0; i < action.pk.length; ++i){
-    logger.verbose(`action pk is ${action.pk[i]}`)
-      if (hasPath([`${action.pk[i]}`])(state['api'][action.resource]["GET"]["body"])){
-        stateHasPk = true;
-        break;
-      }
-  }
-  logger.verbose(`statehaspk ${stateHasPk}`)
-  if (!stateHasPk) return false;
-  logger.verbose(`relevantaction returning true`)
-  return true;
+  const hasType = hasPath(['api', payload.resource, "GET", "body"])(state);
+  if (!hasType) return false;
+  payload.pk = payload.pk.map(pk => {if (hasPath(["api", payload.resource, "GET", "body", `${pk}`], state)) {return pk}});
+  if (payload.pk.length === 0) return null;
+  return payload;
 }
 
+const pathTypePropRest = pipe(
+  prop("type"),
+  toLower,
+  concat("/"),
+)
 
 function handleWsMessage(store, data) {
   try {
     const { resource } = JSON.parse(data);
-    const payload = JSON.parse(resource);
-    if (isRelevantAction(store, payload)){
-      store.dispatch({ type: payload.resource, op: payload.op, pk: payload.pk });
+    const  payload  = JSON.parse(resource);
+    logger.verbose(`RECEIVED WS PAYLOAD: ${JSON.stringify(payload)}`)
+    const relevantAction = extractRelevantAction(store, payload);
+    if (relevantAction){
+      if (payload.op === "UPDATE"){
+        const action = {type: payload.resource, meta: {method: "GET", kind: "REQUEST", query: {pk: relevantAction.pk}}};
+        const opts = {http: httpFetch, url: 'http://localhost:8000'}
+        opts
+          .http({method: "GET", url: opts.url})
+          .then(({ body }) =>
+            pipe(
+              addActionMeta(opts, body),
+              actionHttp(opts, store),
+            )).then(handler => handler(action));
+        // logger.verbose(`DISPATCHING ACTION ${JSON.stringify(action)} against payload ${JSON.stringify(payload)}`);
+        // store.dispatch(action);
+      }
     }
   } catch (e) {
     console.error("Could not process message:");

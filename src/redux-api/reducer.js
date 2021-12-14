@@ -1,5 +1,7 @@
-import { pathEq, hasPath } from "ramda"
+import { pathEq, hasPath, pipe } from "ramda"
 import logger from "./log"
+import actionHttp from "./actionHttp"
+import addActionMeta from "./actionMeta"
 
 const initialState = {}
 
@@ -24,7 +26,6 @@ export function createReducer(opts) {
 
   return (state = initialState, action) => {
     logger.verbose(`Reducing ${action.type} against ${opts.url}`);
-    
     if (isHttpResponse(action) && isMethodGet(action)) {
       logMatchingAction(opts.url, "response", action.type);
       
@@ -45,25 +46,6 @@ export function createReducer(opts) {
             requestHeaders: action.meta.headers,
           },
         },
-      }
-    }
-    
-    if (hasPath(["op"])(action) && action.op === "DELETE"){
-      
-      const hasPrevState = hasPath([action.type])(state) && hasPath([action.meta.method])(state[action.type]);
-      const resourceState = hasPrevState ? state[action.type][action.meta.method]["body"] : {};
-      
-      action.pk.forEach(pk => {if (pk in resourceState) delete resourceState[pk]})
-      
-      return {
-        ...state,
-        [action.type]: {
-          ...state[action.type],
-          [action.meta.method]: {
-            "body": resourceState,
-            loading: false
-          }
-        }
       }
     }
 

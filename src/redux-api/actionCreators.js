@@ -12,7 +12,7 @@ export function createReduxApiActionGet(type) {
   return (query = {}, meta = {}) =>
     ({
       type,
-      meta: { query, ...meta },
+      meta: { query, method: "GET", ...meta },
     })
 }
 

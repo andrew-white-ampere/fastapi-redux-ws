@@ -42,13 +42,13 @@ async def get_todo(pk: List[int] = Query(None)) -> List[TodoModel]:
 		res = [TodoModel(**dict(r)) for r in res.fetchall()]
 		return res
 
-@app.delete('/todos', response_model=bool)
-async def delete_todo(pk: int) -> bool:
+@app.delete('/todos', response_model=int)
+async def delete_todo(pk: int) -> int:
 	async with engine.begin() as conn:
 		res = await conn.execute(text("""
 			DELETE FROM private.todos WHERE pk = :pk;
 		"""), {'pk': pk})
-	return True
+	return pk
 
 @app.post('/todos', response_model=int)
 async def post_todo(todo: TodoModel) -> int:
@@ -62,8 +62,8 @@ async def post_todo(todo: TodoModel) -> int:
 		)
 	return res.fetchone()[0]
 
-@app.patch('/todos', response_model=bool)
-async def patch_todo(pk: int, todo: TodoModel) -> bool:
+@app.patch('/todos', response_model=int)
+async def patch_todo(pk: int, todo: TodoModel) -> int:
 	async with engine.begin() as conn:
 		res = await conn.execute(
 			text(
@@ -75,4 +75,4 @@ async def patch_todo(pk: int, todo: TodoModel) -> bool:
 						pk = :pk
 				"""
 			), {'content': todo.content,  'pk': pk})
-		return True
+		return pk
