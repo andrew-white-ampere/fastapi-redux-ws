@@ -1,9 +1,6 @@
 import React from "react";
-import { useListTodos } from "../hooks/todos";
-import { useDispatchHideTodoImage, useSelectTodoImage, useTodoImageState } from "../hooks/todoImage";
+import { useDispatchHideTodoImage, useTodoImageState } from "../hooks/todoImage";
 import TodoListItem from "./TodoListItem";
-import { makeStyles } from '@material-ui/core/styles';
-import logo from "../images/logo.svg";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
