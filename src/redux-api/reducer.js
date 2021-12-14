@@ -1,7 +1,5 @@
 import { pathEq, hasPath, pipe } from "ramda"
 import logger from "./log"
-import actionHttp from "./actionHttp"
-import addActionMeta from "./actionMeta"
 
 const initialState = {}
 
@@ -12,63 +10,48 @@ export function createReducer(opts) {
     hasMetaKind("RESPONSE")(action)
   );
 
-  const isHttpRequest = (action) => (
-    hasMetaKind("REQUEST")(action)
-  );
-
   const isMethodGet = (action) => (
     pathEq(["meta", "method"], "GET")(action)
   );
 
-  const isMethodPost = (action) => (
-    pathEq(["meta", "method"], "POST")(action)
+  const isMethodDelete = (action) => (
+    pathEq(["meta", "method"], "DELETE")(action)
+  );
+
+  const isMethodTruncate = (action) => (
+    pathEq(["meta", "method"], "TRUNCATE")(action)
   );
 
   return (state = initialState, action) => {
     logger.verbose(`Reducing ${action.type} against ${opts.url}`);
-    if (isHttpResponse(action) && isMethodGet(action)) {
-      logMatchingAction(opts.url, "response", action.type);
+    
+    if (isHttpResponse(action)){
+      const hasPrevState = hasPath([action.type])(state);
+      const resourceState = hasPrevState ? {...state[action.type]} : {};
       
-      const hasPrevState = hasPath([action.type])(state) && hasPath([action.meta.method])(state[action.type]);
-      const prevResourceState = hasPrevState ? state[action.type][action.meta.method]["body"] : {};
-      const indexedResponse =  action.meta.response.body.reduce((a, x) => ({...a, [x.pk]: x}), {});
-      const newResourceState = {...prevResourceState, ...indexedResponse};
-
-      return {
-        ...state,
-        [action.type]: {
-          ...state[action.type],
-          [action.meta.method]: {
-            "body": newResourceState,
-            url: action.meta.url,
-            query: action.meta.query,
-            loading: false,
-            requestHeaders: action.meta.headers,
+      if (isMethodGet(action)) {
+        const newResourceState = {...resourceState, ...action.meta.response.body};
+        return {
+          ...state,
+          [action.type]: {
+            ...state[action.type],
+            ...newResourceState
           },
-        },
+        }
       }
-    }
-
-    if (isHttpResponse(action) && isMethodPost(action)){
-      logger.verbose(`ismethod post response`);
-      const hasPrevState = hasPath([action.type])(state) && hasPath([action.meta.method])(state[action.type]);
-      const resourceState = hasPrevState ? state[action.type][action.meta.method]["body"] : {};
-      const newObj = {
-        [action.meta.response.body]: {pk: action.meta.response.body}
-      }
-
-      const newResourceState = {...resourceState, ...newObj}
-
-      logger.verbose(`new resource state is ${JSON.stringify(newResourceState)}`);
-
-      return {
-        ...state,
-        [action.type]: {
-          ...state[action.type],
-          [action.meta.method]: {
-            "body": newResourceState,
-            loading: false
+      else if (isMethodDelete(action)){
+        action.meta.response.body.forEach(pk => delete resourceState[pk]);
+        return {
+          ...state,
+          [action.type]: {
+            ...resourceState
           }
+        }
+      }
+      else if ((isMethodTruncate(action))){
+        return {
+          ...state,
+          [action.type]: {}
         }
       }
     }

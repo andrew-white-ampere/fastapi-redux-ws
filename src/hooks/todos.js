@@ -13,7 +13,7 @@ const {
   useDispatchDelete
 } = makeReduxApiHooks("todos");
 
-const todosFromState = path(["api", "todos", "GET", "body"]);
+const todosFromState = path(["api", "todos"]);
 
 export function useListTodos(pks=null) {
   const dispatch = useDispatchGet();

@@ -11,9 +11,10 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { useSelector } from "react-redux";
 
 export default function Todos() {
-  const todos = useListTodos();
+  const todos = useSelector((state)=> state.api.todos);
   const dispatchHideTodoImage = useDispatchHideTodoImage()
   const imageState = useTodoImageState();
 

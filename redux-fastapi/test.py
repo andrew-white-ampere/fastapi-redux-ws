@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from fastapi import FastAPI, WebSocket, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.param_functions import Body
@@ -32,23 +32,26 @@ app.add_middleware(
 	allow_headers=["*"]
 )
 
-@app.get('/todos', response_model=List[TodoModel])
-async def get_todo(pk: List[int] = Query(None)) -> List[TodoModel]:
+@app.get('/todos', response_model=Dict[int, TodoModel])
+async def get_todo(pk: List[int] = Query(None)) -> Dict[int, TodoModel]:
 	async with engine.begin() as conn:
 		if pk:
 			res = await conn.execute(text('SELECT * FROM todos  WHERE pk = ANY(:pk)'), {'pk': pk})
 		else:
 			res = await conn.execute(text('SELECT * FROM todos'))
-		res = [TodoModel(**dict(r)) for r in res.fetchall()]
+		res = {r.pk: TodoModel(**dict(r)) for r in res.fetchall()}
 		return res
 
-@app.delete('/todos', response_model=int)
-async def delete_todo(pk: int) -> int:
+@app.delete('/todos', response_model=List[int])
+async def delete_todo(pk: int) -> List[int]:
 	async with engine.begin() as conn:
-		res = await conn.execute(text("""
+		try:
+			res = await conn.execute(text("""
 			DELETE FROM private.todos WHERE pk = :pk;
-		"""), {'pk': pk})
-	return pk
+			"""), {'pk': pk})
+			return [pk]
+		except:
+			raise
 
 @app.post('/todos', response_model=int)
 async def post_todo(todo: TodoModel) -> int:
@@ -62,8 +65,8 @@ async def post_todo(todo: TodoModel) -> int:
 		)
 	return res.fetchone()[0]
 
-@app.patch('/todos', response_model=int)
-async def patch_todo(pk: int, todo: TodoModel) -> int:
+@app.patch('/todos', response_model=List[int])
+async def patch_todo(pk: int, todo: TodoModel) -> List[int]:
 	async with engine.begin() as conn:
 		res = await conn.execute(
 			text(
@@ -75,4 +78,4 @@ async def patch_todo(pk: int, todo: TodoModel) -> int:
 						pk = :pk
 				"""
 			), {'content': todo.content,  'pk': pk})
-		return pk
+		return [pk]

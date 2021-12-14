@@ -7,20 +7,12 @@ const { reducer, middleware } = connectReduxApi({
   url: "http://localhost:8000"
 });
 
-// const store = createStore(
-//   combineReducers({api: reducer, editTodo, todoImage}),
-//   composeWithDevTools( 
-//     connectPgWebsocket({ url: "ws://localhost:8080/websocket" }),
-//     applyMiddleware(middleware)
-//   )
-// );
-
 const store = configureStore(
   {
     reducer: {api: reducer, editTodo: editTodo},
     devTools: true,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat([middleware]),
-    enhancers: [connectPgWebsocket({ url: "ws://localhost:8080/websocket"})]
+    enhancers: [connectPgWebsocket({ wsUrl: "ws://localhost:8080/websocket", apiUrl: "http://localhost:8000"})]
   }
 )
 

@@ -1,5 +1,5 @@
 import { stringify } from "querystring"
-import { path, pathEq, pick, pipe, toLower, hasPath } from "ramda"
+import { path, pathEq, pick, pipe, toLower } from "ramda"
 import { isString, isObject } from "./util"
 import logger from "./log"
 
@@ -54,14 +54,21 @@ export default function actionHttp(opts, store) {
     if (isHttpRequestAction(action)) {
         logRequest(action)
         performHttpRequest(opts.http, action).then((response) => {
-          logResponse(action)
-          dispatchResponse(store, action, response)
+          if (action.meta.method == "POST" && response.status === 200){
+            action = {type: action.type, kind: "REQUEST", meta: {url: action.meta.url, method: "GET", query: {pk: response.body}}};
+            performHttpRequest(opts.http, action).then((response)=>{
+              logResponse(action);
+              dispatchResponse(store, action, response);
+            })
+          } else {
+            logResponse(action);
+            dispatchResponse(store, action, response)
+          }
         })
     }
     return action
   }
 }
-
 
 
 function getUrl(url, query) {
