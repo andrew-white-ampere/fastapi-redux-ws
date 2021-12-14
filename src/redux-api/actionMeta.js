@@ -7,7 +7,11 @@ import {
   prop,
   propSatisfies,
   toLower,
-  hasPath
+  hasPath,
+  split,
+  map,
+  slice,
+  nth
 } from "ramda"
 import logger from "./log"
 import { isString } from "./util"
@@ -61,6 +65,8 @@ function standardiseActionMeta(meta) {
 const pathTypePropRest = pipe(
   prop("type"),
   toLower,
+  split("/"),
+  nth(1),
   concat("/"),
 )
 
@@ -68,9 +74,7 @@ function matchesRestEndpoint(
   action,
   apiRoot,
 ) {
-  return propSatisfies(
-    pipe(keys, includes(pathTypePropRest(action))),
-    "paths",
-    apiRoot,
-  )
+  const resource = split('/')(action.type)[1]; // each action consists of domain then resouce, e.g. "api/todos"
+  const pathkeys = map(slice(1, Infinity))(keys(apiRoot["paths"])); // each endpoint starts with "/", hence the slice
+  return includes(resource)(pathkeys);
 }

@@ -1,56 +1,38 @@
 import React, { useCallback } from "react";
-import { useGetEditFormState, useSetEditFormState, useDispatchEditTodo, useDispatchDeleteTodo } from "../hooks/todos";
-import { useDispatchHideTodoImage } from "../hooks/todoImage";
+import { useDispatch, useSelector } from "react-redux";
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TodoEditForm from "./TodoEditForm";
-
+import { makeReduxApiHooks } from "../redux-api/main";
+import { toggleIsEditing } from "../store";
+import { hasPath } from 'ramda';
 
 export default function TodoListItem({
   pk,
   content,
   created_at,
   todo_idx,
-  todo_pk
 }) {
-  const editFormState = useGetEditFormState();
-  const setEditFormState = useSetEditFormState();
-  const isEditing = editFormState.pk === pk;
-  const onContentClick = useCallback(
-    () => setEditFormState({ pk, content }),
-    [setEditFormState, pk, content]
-  );
-  const dispatchDelete = useDispatchDeleteTodo();
+  const { useDispatchDelete } = makeReduxApiHooks('todos');
+  const dispatchDeleteTodos = useDispatchDelete();
+  const dispatch = useDispatch();
+  const isEditing = useSelector((state) => state.editTodo.isEditing);
 
   return (
-    <TableRow key={todo_pk}>
+    <TableRow key={pk}>
               <TableCell component="th" scope="row">
                 {pk}
               </TableCell>
-              {isEditing ? (
+              {( (pk in isEditing) && isEditing[pk]) ? (
                   <TodoEditForm pk={pk} />
                 ) : (
-                  <TableCell onClick={() => onContentClick()}>{content}</TableCell>
+                  <TableCell onClick={() => dispatch(toggleIsEditing(pk))}>{content}</TableCell>
                 )}
-              <TableCell align="right"> {content}</TableCell>
+              <TableCell align="right"> {(pk in isEditing) ? `${isEditing[pk]}` : 'FALSE' }</TableCell>
               <TableCell align="left">{created_at}</TableCell>
               <TableCell align="right">{todo_idx}</TableCell>
               <TableCell align="right"></TableCell>
-              <TableCell onClick={() => dispatchDelete(pk)}>delete</TableCell>
+              <TableCell onClick={() => dispatch(dispatchDeleteTodos(pk))}>delete</TableCell>
     </TableRow>
   );
-}
-
-function TodoImage(content_image) {
-  return (
-    <img
-      className="todo-image"
-      alt="uploaded with the todo"
-      src={`data:*/*;base64,${content_image}`}
-    />
-  );
-}
-
-function TodoDate({ date }) {
-  return <span className="todo-date">{new Date(date).toLocaleString()}</span>;
 }

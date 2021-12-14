@@ -1,4 +1,4 @@
-import { pathEq, hasPath, pipe } from "ramda"
+import { pathEq, hasPath } from "ramda"
 import logger from "./log"
 
 const initialState = {}
@@ -7,7 +7,7 @@ export function createReducer(opts) {
   const hasMetaKind = pathEq(["meta", "kind"])
 
   const isHttpResponse = (action) => (
-    hasMetaKind("RESPONSE")(action)
+    pathEq(["meta", "kind"], "RESPONSE")(action)
   );
 
   const isMethodGet = (action) => (
@@ -59,9 +59,4 @@ export function createReducer(opts) {
     
     return state
   }
-}
-
-
-function logMatchingAction(url, kind, type) {
-  logger.debug(`Reducing received HTTP ${kind} ${type} against ${url}`)
 }

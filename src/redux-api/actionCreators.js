@@ -1,14 +1,17 @@
 
-export function createReduxApiActions(type) {
+export function createReduxApiActions(endpoint) {
   return {
-    get: createReduxApiActionGet(type),
-    post: createReduxApiActionPost(type),
-    patch: createReduxApiActionPatch(type),
-    delete: createReduxApiActionDelete(type),
+    get: createReduxApiActionGet(endpoint),
+    post: createReduxApiActionPost(endpoint),
+    patch: createReduxApiActionPatch(endpoint),
+    delete: createReduxApiActionDelete(endpoint),
   }
 }
 
-export function createReduxApiActionGet(type) {
+const getEndpointType = (endpoint) => `api/${endpoint}`;
+
+export function createReduxApiActionGet(endpoint) {
+  const type = getEndpointType(endpoint);
   return (query = {}, meta = {}) =>
     ({
       type,
@@ -16,7 +19,8 @@ export function createReduxApiActionGet(type) {
     })
 }
 
-export function createReduxApiActionPost(type) {
+export function createReduxApiActionPost(endpoint) {
+  const type = getEndpointType(endpoint);
   return (body, meta = {}) =>
     ({
       type,
@@ -24,7 +28,8 @@ export function createReduxApiActionPost(type) {
     })
 }
 
-export function createReduxApiActionPatch(type) {
+export function createReduxApiActionPatch(endpoint) {
+  const type = getEndpointType(endpoint);
   return (query, body, meta = {}) =>
     ({
       type,
@@ -32,7 +37,8 @@ export function createReduxApiActionPatch(type) {
     })
 }
 
-export function createReduxApiActionDelete(type) {
+export function createReduxApiActionDelete(endpoint) {
+  const type = getEndpointType(endpoint);
   return (query, meta = {}) =>
     ({
       type,

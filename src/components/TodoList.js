@@ -11,9 +11,8 @@ import Paper from '@material-ui/core/Paper';
 import { useSelector } from "react-redux";
 
 export default function Todos() {
-  const todos = useSelector((state)=> state.api.todos);
+  const todos = useSelector((state)=> state.api["api/todos"]);
   const dispatchHideTodoImage = useDispatchHideTodoImage()
-  const imageState = useTodoImageState();
 
   return (
     <div>

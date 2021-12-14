@@ -34,6 +34,8 @@ export default function connectPgWebsocket({ wsUrl, apiUrl }) {
   };
 }
 
+const getTypeFromResource = (resource) => `api/${resource}`;
+
 function extractRelevantAction(store, payload) {
   const state = store.getState()
   const hasType = hasPath(['api', payload.resource])(state);
@@ -45,7 +47,7 @@ function extractRelevantAction(store, payload) {
 }
 
 function handleUpdate(opts, store, payload){
-  const action = {type: payload.resource, meta: {method: "GET", kind: "REQUEST", query: {pk: payload.pk}}};
+  const action = {type: getTypeFromResource(payload.resource), meta: {method: "GET", kind: "REQUEST", query: {pk: payload.pk}}};
   opts
     .http({method: "GET", url: opts.url})
     .then(({ body }) =>
@@ -56,11 +58,11 @@ function handleUpdate(opts, store, payload){
 }
 
 function handleDelete(store, payload){
-  store.dispatch({type: payload.resource, meta: {method: "DELETE", kind: "RESPONSE", response: {body: payload.pk}}});
+  store.dispatch({type: getTypeFromResource(payload.resource), meta: {method: "DELETE", kind: "RESPONSE", response: {body: payload.pk}}});
 }
 
 function handleTruncate(store, payload){
-  store.dispatch({type: payload.resource, meta: {method: "TRUNCATE", kind: "RESPONSE"}});
+  store.dispatch({type: getTypeFromResource(payload.resource), meta: {method: "TRUNCATE", kind: "RESPONSE"}});
 }
 
 function handleWsMessage(opts, store, data) {
