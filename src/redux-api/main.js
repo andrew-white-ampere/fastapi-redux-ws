@@ -14,7 +14,6 @@ import {
   makeReduxApiHookDelete,
 } from "./hooks"
 
-import { createReduxApiSelectors } from "./selectors"
 
 export {
   connectApi as connectReduxApi,
@@ -23,7 +22,6 @@ export {
   createReduxApiActionPost,
   createReduxApiActionPatch,
   createReduxApiActionDelete,
-  createReduxApiSelectors,
   makeReduxApiHooks,
   makeReduxApiHookGet,
   makeReduxApiHookPost,

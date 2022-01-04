@@ -1,5 +1,4 @@
 import React from "react";
-import { useDispatchHideTodoImage, useTodoImageState } from "../slices/todoImage";
 import TodoListItem from "./TodoListItem";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,10 +8,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { useSelector } from "react-redux";
+import { path } from "ramda";
 
 export default function Todos() {
-  const todos = useSelector((state)=> state.api["api/todos"]);
-  //const dispatchHideTodoImage = useDispatchHideTodoImage()
+  const todos = useSelector(path(["api", "api/todos"]));
 
   return (
     <div>
@@ -29,8 +28,8 @@ export default function Todos() {
         </TableHead>
         <TableBody>
       {todos &&
-        Object.entries(todos).map(([todo_pk, props]) => (
-          <TodoListItem  {...props} key={todo_pk}/>
+        Object.entries(todos).map(([pk, props]) => (
+          <TodoListItem  {...props} key={pk}/>
         ))}
         </TableBody>
       </Table>

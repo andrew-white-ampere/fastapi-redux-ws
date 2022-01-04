@@ -1,10 +1,8 @@
 import { pathEq, hasPath } from "ramda"
-import logger from "./log"
 
 const initialState = {}
 
 export function createReducer(opts) {
-  const hasMetaKind = pathEq(["meta", "kind"])
 
   const isHttpResponse = (action) => (
     pathEq(["meta", "kind"], "RESPONSE")(action)

@@ -38,11 +38,11 @@ const getTypeFromResource = (resource) => `api/${resource}`;
 
 function extractRelevantAction(store, payload) {
   const state = store.getState()
-  const hasType = hasPath(['api', payload.resource])(state);
+  const hasType = hasPath(['api', `api/${payload.resource}`])(state);
   if (!hasType) return null;
   const hasPk = hasPath(['pk'])(payload);
   if (!hasPk) return payload;
-  payload.pk = payload.pk.map(pk => {if (hasPath(["api", payload.resource, `${pk}`], state)) {return pk}});
+  payload.pk = payload.pk.map(pk => {if (hasPath(["api", `api/${payload.resource}`, `${pk}`], state)) {return pk}});
   return payload;
 }
 
