@@ -72,7 +72,7 @@ export function useDispatchEditTodo() {
   logger.verbose(`todopk, content: ${pk}, ${JSON.stringify(content)}`)
   const dispatchPatch = useDispatchPatch();
   const dispatch = useCallback(
-    () => dispatchPatch({ pk: pk }, { content }),
+    () => dispatchPatch({ pk: pk }, content),
     [dispatchPatch, pk, content]
   );
 

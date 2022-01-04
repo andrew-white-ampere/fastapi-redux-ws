@@ -41,7 +41,7 @@ export function createReduxApiActionDelete(endpoint) {
   const type = getEndpointType(endpoint);
   return (query, meta = {}) =>
     ({
-      type,
-      meta: { query, method: "DELETE", ...meta },
+      type: type,
+      meta: {query: {pk: query}, method: "DELETE", ...meta },
     })
 }

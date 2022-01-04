@@ -3,6 +3,7 @@ import { connectReduxApi } from "./redux-api/main";
 import connectPgWebsocket from "./helpers/ws";
 import editTodo from './reducers/editTodoForm'
 import logger from './redux-api/log';
+import { hasPath } from 'ramda';
 
 const { reducer, middleware } = connectReduxApi({
   url: "http://localhost:8000"
@@ -22,21 +23,24 @@ export const { setTodosFormState } = todosFormSlice.actions;
 
 const editTodoSlice = createSlice({
   name: 'editTodo',
-  initialState: { isEditing: {}, },
+  initialState: { },
   reducers: {
     toggleIsEditing: (state, action) => {
       const payload = action.payload;
       logger.verbose(`TOGGLING ISEDITING WITH action ${JSON.stringify(action)} PAYLOAD ${payload}`);
-      if (action.payload in state.isEditing){
-        state.isEditing[action.payload] = !state.isEditing[action.payload]
+      if (hasPath([action.payload], state)){
+        state[action.payload]["isEditing"] = !state[action.payload]["isEditing"];
       } else {
-        state.isEditing[action.payload] = true;
+        state[action.payload] = {isEditing: true, content: ""};
       }
+    },
+    setEditTodoState: (state, action) => {
+      state[action.payload.pk]["content"] = action.payload.content;
     }
   }
 });
 
-export const { toggleIsEditing } = editTodoSlice.actions;
+export const { toggleIsEditing, setEditTodoState } = editTodoSlice.actions;
 
 const store = configureStore(
   {
