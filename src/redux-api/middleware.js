@@ -10,7 +10,6 @@ export default function middleware(optsInternal) { return (store) => {
     )
 
     return (next) => (action) => {
-      logger.verbose(`action is ${JSON.stringify(action)}`);
       if (split('/')(action.type)[0] == "api"){
         optsInternal
         .http({method: "GET", url: optsInternal.url })

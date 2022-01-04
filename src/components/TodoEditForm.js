@@ -1,14 +1,13 @@
 import React from "react";
-import { useGetEditFormState, useDispatchEditTodo, useSetEditFormState } from "../hooks/todos";
 import { makeReduxApiHooks } from "../redux-api/main";
 import { useDispatch, useSelector } from "react-redux";
 import { path } from "ramda";
-import { toggleIsEditing, setEditTodoState } from "../store";
+import { toggleIsEditing, setEditTodoState } from "../slices/editTodo";
 
 export default function TodoEditForm({ pk }) {
-  const setEditFormState = useSetEditFormState()
+  //const setEditFormState = useSetEditFormState()
   //const editFormState = useGetEditFormState()
-  const submitTodo = useDispatchEditTodo()
+  //const submitTodo = useDispatchEditTodo()
   const { useDispatchPatch, useDispatchGet } = makeReduxApiHooks('todos');
   const dispatchTodoPatch = useDispatchPatch();
   const dispatchTodoGet = useDispatchGet();

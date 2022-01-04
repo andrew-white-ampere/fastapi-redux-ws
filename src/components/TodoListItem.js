@@ -4,7 +4,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TodoEditForm from "./TodoEditForm";
 import { makeReduxApiHooks } from "../redux-api/main";
-import { toggleIsEditing } from "../store";
+import { toggleIsEditing } from "../slices/editTodo";
 import { path } from 'ramda';
 
 export default function TodoListItem({

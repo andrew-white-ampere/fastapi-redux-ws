@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatchHideTodoImage, useTodoImageState } from "../hooks/todoImage";
+import { useDispatchHideTodoImage, useTodoImageState } from "../slices/todoImage";
 import TodoListItem from "./TodoListItem";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 
 export default function Todos() {
   const todos = useSelector((state)=> state.api["api/todos"]);
-  const dispatchHideTodoImage = useDispatchHideTodoImage()
+  //const dispatchHideTodoImage = useDispatchHideTodoImage()
 
   return (
     <div>
@@ -21,7 +21,7 @@ export default function Todos() {
         <TableHead>
           <TableRow>
             <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right" onClick={dispatchHideTodoImage}>Calories</TableCell>
+            <TableCell align="right">Calories</TableCell>
             <TableCell align="left">Fat&nbsp;(g)</TableCell>
             <TableCell align="right">Carbs&nbsp;(g)</TableCell>
             <TableCell align="right">Protein&nbsp;(g)</TableCell>

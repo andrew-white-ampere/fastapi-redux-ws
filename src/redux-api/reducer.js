@@ -23,7 +23,6 @@ export function createReducer(opts) {
   );
 
   return (state = initialState, action) => {
-    logger.verbose(`Reducing ${action.type} against ${opts.url}`);
     
     if (isHttpResponse(action)){
       const hasPrevState = hasPath([action.type])(state);

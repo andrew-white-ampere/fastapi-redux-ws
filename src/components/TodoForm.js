@@ -2,7 +2,7 @@ import { Button } from "@material-ui/core";
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeReduxApiHooks } from "../redux-api/main";
-import { setTodosFormState } from "../store";
+import { setTodosFormState } from "../slices/todosForm";
 
 export default function TodoForm() {
   const { useDispatchGet, useDispatchPost } = makeReduxApiHooks("todos");
